@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Rutas exactas a tus fuentes */
+@font-face {
+  font-family: 'StylishHandwriting';
+  src: url('./assets/fonts/stylish-handwriting-free.regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GratefulMemories';
+  src: url('./assets/fonts/grateful-memories.regular.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dantesque';
+  src: url('./assets/fonts/Dantesque-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Reglas directas de fuentes */
+.font-title { font-family: 'StylishHandwriting', sans-serif !important; }
+.font-hand { font-family: 'GratefulMemories', cursive !important; }
+.font-body { font-family: 'Dantesque', sans-serif !important; }
+
+/* Animación flotante fluida para estrellas */
+@keyframes floatSmooth {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.star-float {
+  animation: floatSmooth 3.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Animación de parpadeo suave para estrellas del Newsletter */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.star-twinkle {
+  animation: twinkle 2.5s infinite ease-in-out;
+  will-change: transform, opacity;
+}

@@ -1,0 +1,28 @@
+# Ignorar cualquier carpeta llamada data o archivo csv de datos
+**/data/
+__pycache__/
+venv/
+
+# Variables de entorno (Credenciales sensibles)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependencias (Se instalan con npm install)
+node_modules/
+
+# Archivos de base de datos o registros con datos personales reales
+*.sqlite
+*.db
+/data/
+/logs/
+
+# Builds / Compilaciones
+/dist
+/build
+
+# Archivos del sistema operativo y VSCode
+.DS_Store
+.vscode/
