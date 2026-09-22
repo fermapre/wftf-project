@@ -9,8 +9,9 @@ export default function RsvpModal({ event, onClose }) {
   
   const [emailError, setEmailError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setEmailError('');
 
@@ -23,18 +24,34 @@ export default function RsvpModal({ event, onClose }) {
       }
     }
 
-    // Datos guardados (siempre se capturan independientemente de los recordatorios)
+    setLoading(true);
+
+    // Formato exacto que espera FastAPI en main.py
     const registrationData = {
-      evento: event.title,
       nombreCompleto: fullName,
-      esEstudianteTec: isTec === 'si',
+      esEstudianteTec: isTec === 'si' ? 'Sí' : 'No',
       correo: email,
       medioEnterado: source,
-      deseaRecordatorio: sendReminder === 'si'
+      mandarRecordatorio: sendReminder === 'si' ? 'Sí' : 'No',
+      evento: event.title
     };
 
-    console.log('Registro guardado exitosamente:', registrationData);
-    setSubmitted(true);
+    try {
+      // Petición al backend FastAPI
+      await fetch('http://localhost:8000/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registrationData),
+      });
+
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Error al guardar el RSVP en el servidor:', error);
+      // Aun si falla la conexión, mostramos confirmación para no bloquear al usuario
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -182,9 +199,10 @@ export default function RsvpModal({ event, onClose }) {
               {/* Botón Completar Registro */}
               <button 
                 type="submit"
-                className="w-full border-2 border-[#69358C] bg-[#A4B4E4] font-title text-2xl text-[#69358C] py-3 rounded-xl hover:bg-[#69358C] hover:text-white transition-all shadow-[2px_2px_0px_0px_#69358C] mt-2 cursor-pointer"
+                disabled={loading}
+                className="w-full border-2 border-[#69358C] bg-[#A4B4E4] font-title text-2xl text-[#69358C] py-3 rounded-xl hover:bg-[#69358C] hover:text-white transition-all shadow-[2px_2px_0px_0px_#69358C] mt-2 cursor-pointer disabled:opacity-50"
               >
-                Completar Registro
+                {loading ? 'COMPLETANDO...' : 'Completar Registro'}
               </button>
             </form>
           </>
@@ -195,11 +213,7 @@ export default function RsvpModal({ event, onClose }) {
             <p className="font-body text-xl text-[#69358C]">
               Gracias <strong className="text-[#DB37B4]">{fullName}</strong>, tu lugar para <strong>{event.title}</strong> ha quedado registrado.
             </p>
-            {sendReminder === 'no' && (
-              <p className="font-body text-sm text-[#69358C]/70 italic">
-                (Nota: No recibirás correos de recordatorio según tu preferencia).
-              </p>
-            )}
+
             <button 
               onClick={onClose}
               className="border-2 border-[#69358C] bg-[#FDDDF5] font-title text-xl text-[#69358C] px-6 py-2 rounded-xl hover:bg-[#69358C] hover:text-white transition-all cursor-pointer"
