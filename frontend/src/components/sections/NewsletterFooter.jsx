@@ -211,6 +211,7 @@ export default function NewsletterFooter() {
 
       {/* FRANJAS DE COLORES DE TRANSICIÓN */}
       <div className="w-full flex flex-col mt-8 sm:mt-12">
+        <div className="h-2 sm:h-2.5 bg-[#FF7A00] border-t-2 border-[#69358C]" />
         <div className="h-2 sm:h-2.5 bg-[#EC4F1C] border-t-2 border-[#69358C]" />
         <div className="h-2 sm:h-2.5 bg-[#DB37B4] border-t-2 border-[#69358C]" />
         <div className="h-2 sm:h-2.5 bg-[#0B0089] border-t-2 border-[#69358C]" />

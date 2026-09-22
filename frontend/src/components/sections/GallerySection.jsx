@@ -1,30 +1,44 @@
-import React, { useState } from 'react';
-import galleryData from '../../data/gallery.json';
+import React, { useState, useEffect } from 'react';
+import Papa from 'papaparse';
 
 export default function GallerySection() {
-  const [expanded, setExpanded] = useState(false);
+  const [galleryData, setGalleryData] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Muestra 3 imágenes inicialmente; si hace clic en "SEE MORE", muestra todas
-  const visibleImages = expanded ? galleryData : galleryData.slice(0, 3);
+  // Carga y parsea el CSV al montar el componente
+  useEffect(() => {
+    Papa.parse('/infoGALERIA.csv', {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: (results) => {
+      if (results.data && results.data.length > 0) {
+        // Invertimos el orden de los datos recibidos
+        const reversedData = [...results.data].reverse();
+        
+        setGalleryData(reversedData);
+        setSelectedImage(reversedData[0]); // Selecciona el id 9 por defecto
+      }
+      setLoading(false);
+    },
+    error: (err) => {
+      console.error('Error al parsear el CSV de galería:', err);
+      setLoading(false);
+    }
+  });
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="galeria" className="relative bg-[#FDDDF5] py-16 text-center">
+        <p className="font-title text-[#69358C] text-2xl">Cargando galería...</p>
+      </section>
+    );
+  }
 
   return (
     <section id="galeria" className="relative bg-[#FDDDF5] transition-all duration-500 overflow-hidden">
-      
-      {/* ONDA DE TRANSICIÓN SUPERIOR */}
-      <div className="w-full overflow-hidden leading-none bg-[#FFFDF6] -mb-1">
-        <svg
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-          className="relative block w-full h-10 sm:h-14 md:h-16"
-        >
-          <path
-            d="M0,0 C150,90 350,-20 500,50 C650,120 850,20 1000,60 C1100,80 1170,50 1200,40 L1200,120 L0,120 Z"
-            fill="#FDDDF5"
-            stroke="#69358C"
-            strokeWidth="5"
-          />
-        </svg>
-      </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-16 space-y-8">
         
@@ -38,44 +52,56 @@ export default function GallerySection() {
           </p>
         </div>
 
-        {/* CONTENEDOR MARCO PRINCIPAL (Azul/Lavanda con sombra flat) */}
-        <div className="relative bg-[#FFEDD2] border-2 border-[#69358C] rounded-3xl p-4 sm:p-6 shadow-[8px_8px_0px_0px_#69358C]">
+        {/* CONTENEDOR TIPO VISOR (Marco Principal) */}
+        <div className="relative bg-[#FFFDF6] border-2 border-[#69358C] rounded-3xl p-4 sm:p-6 shadow-[8px_8px_0px_0px_#69358C]">
           
-          {/* MASONRY GRID */}
-          <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
-            {visibleImages.map((item) => (
-              <div 
-                key={item.id} 
-                className="break-inside-avoid relative group overflow-hidden rounded-2xl border-2 border-[#69358C] bg-white"
-              >
-                <img 
-                  src={item.imagen}  
-                  alt={item.titulo} 
-                  loading="lazy"
-                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                
-                {/* CONTENEDOR INFERIOR CON ELEMENTOS APILADOS */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#69358C]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end items-start p-4 gap-1.5">
-                  <span className="bg-[#DB37B4] border border-[#69358C] text-white px-3 py-0.5 rounded-full font-title text-xs">
-                    {item.tag}
-                  </span>
-                  <span className="font-body text-white text-xl">
-                    {item.titulo}
-                  </span>
-                </div>
-              </div>
-            ))}
+          {/* 1. IMAGEN PRINCIPAL / DESTACADA */}
+          <div className="w-full h-72 sm:h-96 md:h-[480px] overflow-hidden rounded-2xl border-2 border-[#69358C] bg-black/5">
+            {selectedImage && (
+              <img 
+                src={selectedImage.imagen}  
+                alt={selectedImage.titulo || 'Foto de Galería'} 
+                className="w-full h-full object-cover transition-all duration-300"
+              />
+            )}
           </div>
 
-          {/* BOTÓN "SEE MORE" ALINEADO A LA DERECHA */}
-          <div className="flex justify-end mt-4">
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="px-5 py-1.5 bg-[#FFFDF6] border border-[#69358C] text-[#69358C] font-hand text-xl rounded-full hover:bg-[#DB37B4] hover:text-white hover:border-[#DB37B4] transition-all cursor-pointer shadow-sm"
-            >
-              {expanded ? 'SEE LESS' : 'SEE MORE ★'}
-            </button>
+          {/* 2. TEXTO E INFORMACIÓN (Título y Subtítulo/Autor) */}
+          <div className="mt-5 space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="font-title text-2xl sm:text-3xl text-[#69358C]">
+                {selectedImage?.titulo}
+              </h4>
+              {selectedImage?.categoria && (
+                <span className="bg-[#DB37B4] border border-[#69358C] text-white px-3 py-0.5 rounded-full font-title text-xs">
+                  {selectedImage.categoria}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* 3. TIRA DE MINIATURAS INTERACTIVAS */}
+          <div className="mt-6 flex items-center gap-3 overflow-x-auto py-3 px-2 scrollbar-thin">
+            {galleryData.map((item, index) => {
+              const isSelected = selectedImage?.id ? selectedImage.id === item.id : selectedImage === item;
+              return (
+                <button
+                  key={item.id || index}
+                  onClick={() => setSelectedImage(item)}
+                  className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
+                    isSelected 
+                      ? 'border-[#DB37B4] scale-105 shadow-md ring-2 ring-[#DB37B4]/50' 
+                      : 'border-[#69358C] opacity-70 hover:opacity-100 hover:scale-100'
+                  }`}
+                >
+                  <img 
+                    src={item.imagen} 
+                    alt={item.titulo || `Miniatura ${index + 1}`} 
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              );
+            })}
           </div>
 
         </div>

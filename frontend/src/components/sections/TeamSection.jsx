@@ -30,7 +30,7 @@ export default function TeamSection() {
   const currentMember = teamData[currentIndex];
 
   return (
-    <section id="nosotras" className="relative bg-[#FFFDF6] py-16 px-4 md:px-8 border-[#69358C] overflow-hidden">
+    <section id="nosotras" className="relative bg-[#FFFDF6]">
       
       {/* 1. ENCABEZADO PRINCIPAL Y NAVEGACIÓN */}
       <div className="max-w-4xl mx-auto text-center mb-6">
@@ -166,6 +166,33 @@ export default function TeamSection() {
           100% { width: 100%; }
         }
       `}</style>
+
+      <div className="w-full overflow-hidden leading-none mt-8 -mb-1">
+        <svg
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+          className="relative block w-full h-12 sm:h-16 md:h-20"
+        >
+          <path
+            d="M0,0 C150,90 350,-50 500,40 C650,110 850,0 1000,30 C1100,65 1170,40 1200,30 L1200,90 L0,120 Z"
+            fill="#DB37B4"
+            stroke="#69358C"
+            strokeWidth="5"
+          />
+          <path
+            d="M0,60 C150,105 350,-15 500,55 C650,150 850,25 1000,65 C1100,85 1170,55 1200,80 L1200,120 L0,120 Z"
+            fill="#0B0089"
+            stroke="#69358C"
+            strokeWidth="5"
+          />
+          <path
+            d="M0,112 C150,120 350,0 500,70 C650,180 850,35 1000,80 C1100,100 1170,70 1200,115 L1200,135 L0,120 Z"
+            fill="#FDDDF5"
+            stroke="#69358C"
+            strokeWidth="5"
+          />
+        </svg>
+      </div>
 
 
     </section>
