@@ -16,23 +16,6 @@ export default function NewsletterFooter() {
   const [modalInfo, setModalInfo] = useState({ titulo: '', mensaje: '' });
   const [loading, setLoading] = useState(false);
 
-  // Función para descargar en formato CSV
-  const downloadCSV = (tipo, data) => {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    if (tipo === 'newsletter') {
-      csvContent += `Nombre,Email\n"${data.nombre}","${data.email}"`;
-    } else {
-      csvContent += `Nombre,Email,Mensaje\n"${data.nombre}","${data.email}","${data.mensaje.replace(/"/g, '""')}"`;
-    }
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${tipo}_${data.nombre.toLowerCase().replace(/\s+/g, '_')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     if (!newsNombre.trim() || !newsEmail.trim()) return;
@@ -51,10 +34,9 @@ export default function NewsletterFooter() {
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#DB37B4', '#69358C', '#EA920A', '#A4B4E4']
+        colors: ['#e74a98', '#ffea2e', '#88cb8a', '#7898f8']
       });
 
-      downloadCSV('newsletter', { nombre: newsNombre, email: newsEmail });
       setModalInfo({
         titulo: '¡GRACIAS POR UNIRTE!',
         mensaje: 'Te has registrado exitosamente en nuestro newsletter.'
@@ -84,10 +66,9 @@ export default function NewsletterFooter() {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#FF7A00', '#DB37B4', '#69358C']
+        colors: ['#e74a98', '#ffea2e', '#88cb8a', '#7898f8']
       });
 
-      downloadCSV('contacto', { nombre: contactNombre, email: contactEmail, mensaje: contactMensaje });
       setModalInfo({
         titulo: '¡MENSAJE ENVIADO!',
         mensaje: 'Nos encantó recibir tu mensaje. Nos pondremos en contacto contigo muy pronto.'
@@ -101,7 +82,7 @@ export default function NewsletterFooter() {
   };
 
   return (
-    <section id="contacto" className="relative bg-[#DDBCF0] overflow-hidden text-[#69358C] pt-12 pb-12">
+    <section id="contacto" className="relative bg-[#DDBCF0] overflow-hidden text-[#69358C] pt-8 sm:pt-12 pb-">
       
       {/* ANIMACIÓN DE PARPADEO SIMPLE */}
       <style>{`
@@ -123,6 +104,14 @@ export default function NewsletterFooter() {
         <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute top-36 right-[28%] w-4 sm:w-6 h-auto" style={{ animationDelay: '0.4s' }} />
         <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute bottom-28 left-[8%] w-5 sm:w-7 h-auto" style={{ animationDelay: '1.9s' }} />
         <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute bottom-16 right-[18%] w-4 sm:w-6 h-auto" style={{ animationDelay: '1.1s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute top-5 left-[48%] w-4 sm:w-6 h-auto" style={{ animationDelay: '0.2s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute top-20 left-[4%] w-3 sm:w-5 h-auto" style={{ animationDelay: '1.6s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute top-44 left-[22%] w-4 sm:w-5 h-auto" style={{ animationDelay: '0.6s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute top-24 right-[46%] w-3 sm:w-4 h-auto" style={{ animationDelay: '1.2s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute top-48 right-[6%] w-5 sm:w-7 h-auto" style={{ animationDelay: '0.5s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute bottom-36 right-[38%] w-4 sm:w-5 h-auto" style={{ animationDelay: '1.7s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute bottom-10 left-[42%] w-5 sm:w-6 h-auto" style={{ animationDelay: '0.9s' }} />
+        <img src="/images/icons/star_purple.svg" alt="Estrella" className="star-twinkle absolute bottom-20 left-[26%] w-3 sm:w-4 h-auto" style={{ animationDelay: '1.3s' }} />
       </div>
 
       {/* ROBOT DECORATIVO IZQUIERDA */}
@@ -171,7 +160,7 @@ export default function NewsletterFooter() {
               </div>
 
               <a
-                href="https://instagram.com/women_ftf"
+                href="https://www.instagram.com/women.ftf/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FDDDF5] border-2 border-[#69358C] rounded-full text-[#69358C] font-body text-xl sm:text-xl font-semibold hover:bg-white transition-all shadow-[2px_2px_0px_0px_#69358C]"
@@ -260,7 +249,7 @@ export default function NewsletterFooter() {
               No te pierdas nuestras últimas actualizaciones ni eventos
             </p>
             
-            <div className="text-center text-[#EA920A] text-xs tracking-widest mb-2">***</div>
+            <div className="text-center text-[#EA920A] text-xl tracking-widest mb-2">***</div>
 
             <h3 className="font-title text-3xl sm:text-4xl md:text-5xl text-[#0B0089] text-center uppercase tracking-wide leading-none">
               ÚNETE A NUESTRO
@@ -269,7 +258,7 @@ export default function NewsletterFooter() {
               NEWSLETTER
             </h3>
 
-            <div className="text-center text-[#EA920A] text-xs tracking-widest mb-4 sm:mb-6">***</div>
+            <div className="text-center text-[#EA920A] text-xl tracking-widest mb-4 sm:mb-6">***</div>
 
             <form onSubmit={handleNewsletterSubmit} className="space-y-3 sm:space-y-4 font-body">
               <div>
@@ -314,8 +303,6 @@ export default function NewsletterFooter() {
                 </div>
               </div>
 
-              <div className="text-center text-[#EA920A] text-xs tracking-widest pt-1">***</div>
-
               <div className="text-center pt-1 sm:pt-2">
                 <button
                   type="submit"
@@ -334,7 +321,7 @@ export default function NewsletterFooter() {
       </div>
 
       {/* FRANJAS DE COLORES DE TRANSICIÓN */}
-      <div className="w-full flex flex-col mt-16 sm:mt-20">
+      <div className="w-full flex flex-col mt-6 sm:mt-8">
         <div className="h-2 sm:h-2.5 bg-[#FF7A00] border-t-2 border-[#69358C]" />
         <div className="h-2 sm:h-2.5 bg-[#EC4F1C] border-t-2 border-[#69358C]" />
         <div className="h-2 sm:h-2.5 bg-[#DB37B4] border-t-2 border-[#69358C]" />
@@ -357,10 +344,10 @@ export default function NewsletterFooter() {
             <a href="https://instagram.com/women_ftf" target="_blank" rel="noopener noreferrer">
               <img src="/images/icons/InstagramIcon.svg" alt="Instagram" className="w-8 h-8 sm:w-9 sm:h-9 hover:scale-110 transition-transform" />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://mx.linkedin.com/company/women-ft-future" target="_blank" rel="noopener noreferrer">
               <img src="/images/icons/LinkedInIcon.svg" alt="LinkedIn" className="w-8 h-8 sm:w-9 sm:h-9 hover:scale-110 transition-transform" />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.facebook.com/WomenForTheFuture/?locale=es_LA" target="_blank" rel="noopener noreferrer">
               <img src="/images/icons/facebookIcon.svg" alt="Facebook" className="w-8 h-8 sm:w-9 sm:h-9 hover:scale-110 transition-transform" />
             </a>
           </div>
@@ -379,15 +366,15 @@ export default function NewsletterFooter() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-[#FFFDF6] border-3 border-[#69358C] rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-[6px_6px_0px_0px_#69358C] space-y-4">
             <span className="text-4xl sm:text-5xl inline-block animate-bounce">🎉</span>
-            <h4 className="font-title text-2xl sm:text-3xl text-[#0B0089]">{modalInfo.titulo}</h4>
-            <p className="font-hand text-base sm:text-lg text-[#69358C]">
+            <h4 className="font-hand text-2xl sm:text-3xl text-[#0B0089]">{modalInfo.titulo}</h4>
+            <p className="font-body text-base sm:text-lg text-[#69358C]">
               {modalInfo.mensaje}
             </p>
             <button
               onClick={() => setShowModal(false)}
               className="px-8 py-2.5 bg-[#DB37B4] border-2 border-[#69358C] text-white font-title text-base sm:text-lg rounded-full hover:bg-[#69358C] transition-all cursor-pointer shadow-[3px_3px_0px_0px_#69358C]"
             >
-              ACEPTAR ✩
+              ACEPTAR
             </button>
           </div>
         </div>

@@ -69,7 +69,7 @@ export default function GallerySection() {
           {/* 2. TEXTO E INFORMACIÓN (Título y Subtítulo/Autor) */}
           <div className="mt-5 space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-title text-2xl sm:text-3xl text-[#69358C]">
+              <h4 className="font-hand text-2xl sm:text-3xl text-[#69358C]">
                 {selectedImage?.titulo}
               </h4>
               {selectedImage?.categoria && (
