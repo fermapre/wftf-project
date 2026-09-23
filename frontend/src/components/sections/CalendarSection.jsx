@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
+import { safeUrl } from '../../lib/api';
 import RsvpModal from '../ui/RsvpModal';
 
 const MONTHS = [
@@ -57,7 +58,7 @@ export default function CalendarSection() {
               location: row.ubicacion || '',
               time: row.hora || '',
               sticker: row.sticker_icon?.trim() || '/images/icons/RSVPsticker1.svg',
-              link: row.URL || ''
+              link: safeUrl(row.URL)
             };
           })
           .filter(event => event.monthIndex !== -1); // Conservar solo meses contemplados
