@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { postJson } from '../../lib/api';
 
 export default function RsvpModal({ event, onClose }) {
   const [fullName, setFullName] = useState('');
@@ -8,12 +9,15 @@ export default function RsvpModal({ event, onClose }) {
   const [sendReminder, setSendReminder] = useState('si');
   
   const [emailError, setEmailError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [honeypot, setHoneypot] = useState(''); // Campo trampa para bots
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEmailError('');
+    setSubmitError('');
 
     // Validar correo institucional únicamente cuando seleccionó "Sí"
     if (isTec === 'si') {
@@ -33,22 +37,16 @@ export default function RsvpModal({ event, onClose }) {
       correo: email,
       medioEnterado: source,
       mandarRecordatorio: sendReminder === 'si' ? 'Sí' : 'No',
-      evento: event.title
+      evento: event.title,
+      website: honeypot
     };
 
     try {
-      // Petición al backend FastAPI
-      await fetch('http://localhost:8000/api/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registrationData),
-      });
-
+      await postJson('/api/rsvp', registrationData);
       setSubmitted(true);
     } catch (error) {
-      console.error('Error al guardar el RSVP en el servidor:', error);
-      // Aun si falla la conexión, mostramos confirmación para no bloquear al usuario
-      setSubmitted(true);
+      // Solo confirmamos el registro si realmente se guardó
+      setSubmitError(error.message);
     } finally {
       setLoading(false);
     }
@@ -76,6 +74,17 @@ export default function RsvpModal({ event, onClose }) {
             <p className="font-body text-s text-[#9A76AF] mb-6">{event.time}</p>
 
             <form onSubmit={handleSubmit} className="space-y-4 font-body text-[#69358C]">
+              {/* Campo trampa: invisible para personas, los bots lo llenan */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                className="hidden"
+              />
               
               {/* 1. Nombre Completo */}
               <div>
@@ -83,6 +92,7 @@ export default function RsvpModal({ event, onClose }) {
                 <input 
                   type="text" 
                   required 
+                  maxLength={150}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Tu nombre completo"
@@ -133,6 +143,7 @@ export default function RsvpModal({ event, onClose }) {
                 <input 
                   type="email" 
                   required 
+                  maxLength={254}
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -195,6 +206,10 @@ export default function RsvpModal({ event, onClose }) {
               </div>
 
               <p className="text-xs text-[#DB37B4] italic">* Todas las respuestas son obligatorias</p>
+
+              {submitError && (
+                <p className="text-red-500 text-sm font-bold" role="alert">{submitError}</p>
+              )}
 
               {/* Botón Completar Registro */}
               <button 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
+import { postJson } from '../../lib/api';
 
 export default function NewsletterFooter() {
   // Estados para el Newsletter
@@ -11,10 +12,28 @@ export default function NewsletterFooter() {
   const [contactEmail, setContactEmail] = useState('');
   const [contactMensaje, setContactMensaje] = useState('');
 
+  // Campos trampa (ocultos) para detectar bots
+  const [newsHoneypot, setNewsHoneypot] = useState('');
+  const [contactHoneypot, setContactHoneypot] = useState('');
+
   // Estados para Modales y Loader
   const [showModal, setShowModal] = useState(false);
-  const [modalInfo, setModalInfo] = useState({ titulo: '', mensaje: '' });
+  const [modalInfo, setModalInfo] = useState({ titulo: '', mensaje: '', exito: true });
   const [loading, setLoading] = useState(false);
+
+  const celebrate = () => {
+    confetti({
+      particleCount: 120,
+      spread: 80,
+      origin: { y: 0.6 },
+      colors: ['#e74a98', '#ffea2e', '#88cb8a', '#7898f8']
+    });
+  };
+
+  const showError = (error) => {
+    setModalInfo({ titulo: '¡UPS!', mensaje: error.message, exito: false });
+    setShowModal(true);
+  };
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -22,28 +41,19 @@ export default function NewsletterFooter() {
 
     setLoading(true);
     try {
-      await fetch('http://localhost:8000/api/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: newsNombre, email: newsEmail }),
-      });
-    } catch (error) {
-      console.error('Error al conectar con la API de newsletter:', error);
-    } finally {
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#e74a98', '#ffea2e', '#88cb8a', '#7898f8']
-      });
-
+      await postJson('/api/newsletter', { nombre: newsNombre, email: newsEmail, website: newsHoneypot });
+      celebrate();
       setModalInfo({
         titulo: '¡GRACIAS POR UNIRTE!',
-        mensaje: 'Te has registrado exitosamente en nuestro newsletter.'
+        mensaje: 'Te has registrado exitosamente en nuestro newsletter.',
+        exito: true
       });
       setShowModal(true);
       setNewsNombre('');
       setNewsEmail('');
+    } catch (error) {
+      showError(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -54,29 +64,25 @@ export default function NewsletterFooter() {
 
     setLoading(true);
     try {
-      await fetch('http://localhost:8000/api/contacto', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: contactNombre, email: contactEmail, mensaje: contactMensaje }),
+      await postJson('/api/contacto', {
+        nombre: contactNombre,
+        email: contactEmail,
+        mensaje: contactMensaje,
+        website: contactHoneypot
       });
-    } catch (error) {
-      console.error('Error al conectar con la API de contacto:', error);
-    } finally {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#e74a98', '#ffea2e', '#88cb8a', '#7898f8']
-      });
-
+      celebrate();
       setModalInfo({
         titulo: '¡MENSAJE ENVIADO!',
-        mensaje: 'Nos encantó recibir tu mensaje. Nos pondremos en contacto contigo muy pronto.'
+        mensaje: 'Nos encantó recibir tu mensaje. Nos pondremos en contacto contigo muy pronto.',
+        exito: true
       });
       setShowModal(true);
       setContactNombre('');
       setContactEmail('');
       setContactMensaje('');
+    } catch (error) {
+      showError(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -175,6 +181,17 @@ export default function NewsletterFooter() {
             </p>
 
             <form onSubmit={handleContactSubmit} className="space-y-3 font-body">
+              {/* Campo trampa: invisible para personas, los bots lo llenan */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={contactHoneypot}
+                onChange={(e) => setContactHoneypot(e.target.value)}
+                className="hidden"
+              />
               <div>
                 <label className="block font-body text-xl sm:text-xl text-[#69358C] mb-1">
                   Tu nombre *
@@ -183,6 +200,7 @@ export default function NewsletterFooter() {
                   type="text"
                   required
                   placeholder="Escribe tu nombre"
+                  maxLength={100}
                   value={contactNombre}
                   onChange={(e) => setContactNombre(e.target.value)}
                   className="w-full px-3 py-2 bg-white border-2 border-[#69358C] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#DB37B4]"
@@ -197,6 +215,7 @@ export default function NewsletterFooter() {
                   type="email"
                   required
                   placeholder="tu@correo.com"
+                  maxLength={254}
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   className="w-full px-3 py-2 bg-white border-2 border-[#69358C] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#DB37B4]"
@@ -211,6 +230,7 @@ export default function NewsletterFooter() {
                   required
                   rows="3"
                   placeholder="¿En qué te podemos ayudar?"
+                  maxLength={2000}
                   value={contactMensaje}
                   onChange={(e) => setContactMensaje(e.target.value)}
                   className="w-full px-3 py-2 bg-white border-2 border-[#69358C] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#DB37B4] resize-none"
@@ -261,6 +281,17 @@ export default function NewsletterFooter() {
             <div className="text-center text-[#EA920A] text-xl tracking-widest mb-4 sm:mb-6">***</div>
 
             <form onSubmit={handleNewsletterSubmit} className="space-y-3 sm:space-y-4 font-body">
+              {/* Campo trampa: invisible para personas, los bots lo llenan */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={newsHoneypot}
+                onChange={(e) => setNewsHoneypot(e.target.value)}
+                className="hidden"
+              />
               <div>
                 <label className="block font-body text-xl sm:text-xl text-[#69358C] mb-1">
                   Ingresa tu nombre *
@@ -275,6 +306,7 @@ export default function NewsletterFooter() {
                     type="text"
                     required
                     placeholder="Tu nombre"
+                    maxLength={100}
                     value={newsNombre}
                     onChange={(e) => setNewsNombre(e.target.value)}
                     className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-white border-2 border-[#69358C] rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#DB37B4]"
@@ -296,6 +328,7 @@ export default function NewsletterFooter() {
                     type="email"
                     required
                     placeholder="ejemplo@correo.com"
+                    maxLength={254}
                     value={newsEmail}
                     onChange={(e) => setNewsEmail(e.target.value)}
                     className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-white border-2 border-[#69358C] rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#DB37B4]"
@@ -365,7 +398,7 @@ export default function NewsletterFooter() {
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-[#FFFDF6] border-3 border-[#69358C] rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-[6px_6px_0px_0px_#69358C] space-y-4">
-            <span className="text-4xl sm:text-5xl inline-block animate-bounce">🎉</span>
+            <span className="text-4xl sm:text-5xl inline-block animate-bounce">{modalInfo.exito ? '🎉' : '⚠️'}</span>
             <h4 className="font-hand text-2xl sm:text-3xl text-[#0B0089]">{modalInfo.titulo}</h4>
             <p className="font-body text-base sm:text-lg text-[#69358C]">
               {modalInfo.mensaje}

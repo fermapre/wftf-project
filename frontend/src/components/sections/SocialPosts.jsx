@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
+import { safeUrl } from '../../lib/api';
 
 export default function SocialPosts() {
   const [postsData, setPostsData] = useState([]);
@@ -40,7 +41,7 @@ export default function SocialPosts() {
             ubicacion: row['ubicación'] || row.ubicacion || '',
             requisitos: requisitos,
             fechaLimite: row.fecha_limite_aplicar || '',
-            link: row.URL || '',
+            link: safeUrl(row.URL),
             imagen: finalImgPath,
             esEventoCalendario: esEvento
           };
